@@ -11,7 +11,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -32,26 +32,41 @@ class App extends React.Component {
       showGeneratedUrl: false,
       hasError: false,
       errors: [],
-      generateButtonDisabled: false
+      generateButtonDisabled: false,
     };
   }
 
   handleSubmit = async () => {
-    this.setState({generatedUrl: "", showGeneratedUrl: false, hasError: false, errors: [], generateButtonDisabled: true});
-    axios.post("http://localhost:8080/generate_url", {
-      url: this.state.inputUrl
-    }).then((response) => {
-      this.setState(
-        {generatedUrl: response.data.url, showGeneratedUrl: true, generateButtonDisabled: false}
-      );
-    }).catch((error) => {
-      this.setState({hasError: true, errors: error.response.data.detail, generateButtonDisabled: false});
+    this.setState({
+      generatedUrl: "",
+      showGeneratedUrl: false,
+      hasError: false,
+      errors: [],
+      generateButtonDisabled: true,
     });
-  }
+    axios
+      .post("http://localhost:8080/generate_url", {
+        url: this.state.inputUrl,
+      })
+      .then((response) => {
+        this.setState({
+          generatedUrl: response.data.url,
+          showGeneratedUrl: true,
+          generateButtonDisabled: false,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          hasError: true,
+          errors: error.response.data.detail,
+          generateButtonDisabled: false,
+        });
+      });
+  };
 
   handleInputChange = (input) => {
-    this.setState({inputUrl: input.target.value});
-  }
+    this.setState({ inputUrl: input.target.value });
+  };
 
   render() {
     return (
@@ -92,38 +107,40 @@ class App extends React.Component {
                 >
                   Generate Shortened URL
                 </Button>
-              {this.state.showGeneratedUrl &&
-                <TextField
-                  margin="normal"
-                  fullWidth
-                  id="generatedUrl"
-                  label="Generated URL"
-                  value={this.state.generatedUrl}
-                />
-              }
-              {this.state.hasError &&
-                <TableContainer component={Paper}>
-                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Error Message</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {this.state.errors.map((row) => (
-                        <TableRow
-                          key={row.msg}
-                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                        >
-                          <TableCell component="th" scope="row">
-                            {row.msg}
-                          </TableCell>
+                {this.state.showGeneratedUrl && (
+                  <TextField
+                    margin="normal"
+                    fullWidth
+                    id="generatedUrl"
+                    label="Generated URL"
+                    value={this.state.generatedUrl}
+                  />
+                )}
+                {this.state.hasError && (
+                  <TableContainer component={Paper}>
+                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Error Message</TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              }
+                      </TableHead>
+                      <TableBody>
+                        {this.state.errors.map((row) => (
+                          <TableRow
+                            key={row.msg}
+                            sx={{
+                              "&:last-child td, &:last-child th": { border: 0 },
+                            }}
+                          >
+                            <TableCell component="th" scope="row">
+                              {row.msg}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
               </Box>
             </Paper>
           </Box>

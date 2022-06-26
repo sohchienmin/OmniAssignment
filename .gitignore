@@ -2,3 +2,6 @@
 .idea
 *.pyc
 venv
+node_modules
+.pytest_cache
+postgres-data

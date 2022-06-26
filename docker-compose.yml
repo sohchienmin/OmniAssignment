@@ -4,17 +4,27 @@ services:
   database:
     build: database
     ports:
-    - 5432:5432
+      - 5432:5432
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
 
   frontend:
     build: frontend
     ports:
       - 3000:3000
+    volumes:
+      - ./frontend:/app
+      - ./frontend/node_modules:/app/node_modules
     depends_on:
       - backend
 
   backend:
     build: backend
+    command: uvicorn app.api.api:app --host 0.0.0.0 --port 8080 --reload
     ports:
       - 8080:8080
-    command: ['python', 'main.py']
+    restart: on-failure
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - database
